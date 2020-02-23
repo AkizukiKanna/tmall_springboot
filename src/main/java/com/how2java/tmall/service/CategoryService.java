@@ -20,7 +20,7 @@ public class CategoryService {
 
     //navigatePages分页导航栏要显示出的页的数量
     public Page4Navigator<Category> list(int start, int size, int navigatePages){
-        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        Sort sort = Sort.by(Sort.Direction.ASC, "id");
         //Pageable pageable = new PageRequest(start, size,sort);过时。
         //PageRequest存放分页信息，第一个参数page(start)是页码，就是本次查询要查询哪一页，默认是从0开始的。
         Pageable pageable = PageRequest.of(start, size, sort);
@@ -35,5 +35,9 @@ public class CategoryService {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         //??只需要列出所有的查询结果，不需要分页，所以使用findAll(Sort)
         return categoryDAO.findAll(sort);
+    }
+
+    public void add(Category bean){
+        categoryDAO.save(bean);
     }
 }
