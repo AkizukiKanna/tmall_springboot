@@ -61,12 +61,17 @@ public class CategoryController {
      * 3. 返回 null, 会被RESTController 转换为空字符串。
      */
     @DeleteMapping("/categories/{id}")
-    public String delete(@PathVariable("id") int id,HttpServletRequest request){
+    public String delete(@PathVariable("id") int id,HttpServletRequest request) throws Exception{
         categoryService.delete(id);
         File imageFolder = new File(request.getServletContext().getRealPath("img/category"));
         File file = new File(imageFolder, id + ".jpg");
         file.delete();
         return null;
+    }
+
+    @GetMapping("/categories/{id}")
+    public Category get(@PathVariable("id") int id) throws Exception{
+        return categoryService.get(id);
     }
 
 }

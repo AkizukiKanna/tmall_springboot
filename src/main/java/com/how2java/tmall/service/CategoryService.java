@@ -44,4 +44,8 @@ public class CategoryService {
     public void delete(int id){
         categoryDAO.deleteById(id);
     }
+
+    public Category get(int id){
+        return categoryDAO.getOne(id);
+    }
 }
