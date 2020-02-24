@@ -5,10 +5,7 @@ import com.how2java.tmall.service.CategoryService;
 import com.how2java.tmall.util.ImageUtil;
 import com.how2java.tmall.util.Page4Navigator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
@@ -16,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+
 
 /**
  * 这个就是专门用来提供 RESTFUL 服务器控制器了
@@ -25,7 +22,6 @@ import java.util.List;
 public class CategoryController {
     @Autowired
     CategoryService categoryService;
-
 
     /**
      * 对于categories 访问，会获取所有的 Category对象集合，并返回这个集合。
@@ -57,4 +53,20 @@ public class CategoryController {
         BufferedImage img = ImageUtil.change2jpg(file);
         ImageIO.write(img, "jpg", file);
     }
+
+
+    /**
+     * 1. 首先根据id 删除数据库里的数据
+     * 2. 删除对应的文件
+     * 3. 返回 null, 会被RESTController 转换为空字符串。
+     */
+    @DeleteMapping("/categories/{id}")
+    public String delete(@PathVariable("id") int id,HttpServletRequest request){
+        categoryService.delete(id);
+        File imageFolder = new File(request.getServletContext().getRealPath("img/category"));
+        File file = new File(imageFolder, id + ".jpg");
+        file.delete();
+        return null;
+    }
+
 }

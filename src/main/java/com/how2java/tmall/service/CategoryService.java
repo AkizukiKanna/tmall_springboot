@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+
 
 @Service
 public class CategoryService {
@@ -30,14 +30,18 @@ public class CategoryService {
         return new Page4Navigator<>(pageFromJPA,navigatePages);
     }
 
-    public List<Category> list(){
-        //创建一个 Sort 对象，表示通过 id 倒排序。2.0版本需要用Sort.by(),原因是Sort类的构造方法被私有化
-        Sort sort = Sort.by(Sort.Direction.DESC, "id");
-        //??只需要列出所有的查询结果，不需要分页，所以使用findAll(Sort)
-        return categoryDAO.findAll(sort);
-    }
+//    public List<Category> list(){
+//        //创建一个 Sort 对象，表示通过 id 倒排序。2.0版本需要用Sort.by(),原因是Sort类的构造方法被私有化
+//        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+//        //??只需要列出所有的查询结果，不需要分页，所以使用findAll(Sort)
+//        return categoryDAO.findAll(sort);
+//    }
 
     public void add(Category bean){
         categoryDAO.save(bean);
+    }
+
+    public void delete(int id){
+        categoryDAO.deleteById(id);
     }
 }
