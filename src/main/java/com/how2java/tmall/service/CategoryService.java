@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 
 
 @Service
@@ -46,6 +47,12 @@ public class CategoryService {
     }
 
     public Category get(int id){
-        return categoryDAO.getOne(id);
+        Optional<Category> byId = categoryDAO.findById(id);
+        Category bean = byId.get();
+        return bean;
+    }
+
+    public void update(Category bean){
+        categoryDAO.save(bean);
     }
 }
