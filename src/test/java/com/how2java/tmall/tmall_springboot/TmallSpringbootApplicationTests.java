@@ -28,10 +28,7 @@ class TmallSpringbootApplicationTests {
         System.out.println(categoryService.list(1,5,3));
     }
 
-    @Test
-    void test01() throws Exception {
-        System.out.println(categoryController.list(0,3).getContent());
-    }
+
 
 
 

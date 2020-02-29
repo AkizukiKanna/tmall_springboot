@@ -12,6 +12,7 @@
     <artifactId>tmall_springboot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>tmall_springboot</name>
+    <packaging>war</packaging>
     <description>Demo project for Spring Boot</description>
 
     <properties>
@@ -19,6 +20,11 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.11</version>
+        </dependency>
         <!-- springboot web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -89,11 +95,11 @@
             <version>8.5.23</version>
         </dependency>
         <!-- mysql-->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.21</version>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>mysql</groupId>-->
+        <!--            <artifactId>mysql-connector-java</artifactId>-->
+        <!--            <version>5.1.21</version>-->
+        <!--        </dependency>-->
 
         <!-- junit -->
         <dependency>
