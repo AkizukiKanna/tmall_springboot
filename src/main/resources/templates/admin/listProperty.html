@@ -38,10 +38,31 @@
                     });
                 },
                 add:function () {
-
+                    if (!checkEmpty(this.bean.name,"属性名称"))
+                        return;
+                    var url = this.uri;
+                    this.bean.category.id = cid;
+                    axios.post(url,this.bean).then(function (response) {
+                        vue.list(0);
+                        vue.bean = {id:0,name:'',category:{id:0}};
+                    })
                 },
-                deleteBean:function () {
-
+                deleteBean:function (id) {
+                    if (!checkDeleteLink())
+                        return;
+                    var url = this.uri + '/' + id;
+                    axios.delete(url).then(function (response) {
+                        if(0!=response.data.length)
+                            alert(response.data);
+                        else
+                            vue.list(0);
+                    })
+                },
+                jump: function(page){
+                    jump(page,vue); //定义在adminHeader.html 中
+                },
+                jumpByNumber: function(start){
+                    jumpByNumber(start,vue);
                 },
             }
         });

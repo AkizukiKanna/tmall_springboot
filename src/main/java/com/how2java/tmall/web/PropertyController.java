@@ -4,10 +4,7 @@ import com.how2java.tmall.pojo.Property;
 import com.how2java.tmall.service.PropertyService;
 import com.how2java.tmall.util.Page4Navigator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class PropertyController {
@@ -21,5 +18,28 @@ public class PropertyController {
                                          @RequestParam(value = "size",defaultValue = "5") int size,
                                          @RequestParam(value = "navigatePages",defaultValue = "5") int navigatePages) throws Exception{
         return propertyService.list(cid, start, size, navigatePages);
+    }
+
+    @PostMapping("/properties")
+    public Property add(@RequestBody Property bean) throws Exception{
+        propertyService.add(bean);
+        return bean;
+    }
+
+    @DeleteMapping("/properties/{id}")
+    public String delete(@PathVariable("id") int id) throws Exception{
+        propertyService.delete(id);
+        return null;
+    }
+
+    @GetMapping("/properties/{id}")
+    public Property get(@PathVariable("id") int id) throws Exception{
+        return propertyService.get(id);
+    }
+
+    @PutMapping("/properties")
+    public Property update(@RequestBody Property bean) throws Exception{
+        propertyService.update(bean);
+        return bean;
     }
 }

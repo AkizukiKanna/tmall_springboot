@@ -45,4 +45,8 @@ public class PropertyService {
     public void update(Property bean){
         propertyDAO.save(bean);
     }
+
+    public Property get(int id){
+        return propertyDAO.findById(id).get();
+    }
 }
