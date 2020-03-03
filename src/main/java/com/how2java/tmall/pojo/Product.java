@@ -1,10 +1,13 @@
 package com.how2java.tmall.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
 @Table(name = "product")
+@JsonIgnoreProperties({ "handler","hibernateLazyInitializer"})
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +24,17 @@ public class Product {
     private float promotePrice;
     private int stock;
     private Date createDate;
+
+    @Transient
+    private ProductImage firstProductImage;
+
+    public ProductImage getFirstProductImage() {
+        return firstProductImage;
+    }
+
+    public void setFirstProductImage(ProductImage firstProductImage) {
+        this.firstProductImage = firstProductImage;
+    }
 
     public int getId() {
         return id;

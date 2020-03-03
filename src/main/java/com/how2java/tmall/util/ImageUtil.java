@@ -41,7 +41,9 @@ public class ImageUtil {
             return null;
         }
     }
-  
+
+
+    //修改图片大小
     public static void resizeImage(File srcFile, int width,int height, File destFile) {
         try {
             if(!destFile.getParentFile().exists())
