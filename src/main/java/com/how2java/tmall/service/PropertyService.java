@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -48,5 +49,9 @@ public class PropertyService {
 
     public Property get(int id){
         return propertyDAO.findById(id).get();
+    }
+
+    public List<Property> listByCategory(Category category){
+        return propertyDAO.findByCategory(category);
     }
 }

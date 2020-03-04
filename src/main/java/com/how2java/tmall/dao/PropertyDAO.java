@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 
 /**
  * 注意看，这个是个接口，它是没有实现类的，至少我们是没有显式提供实现类。 那么要进行条件查询，就是在方法名上面做文章。
@@ -14,4 +16,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface PropertyDAO extends JpaRepository<Property,Integer> {
     Page<Property> findByCategory(Category category, Pageable pageable);
+
+    List<Property> findByCategory(Category category);
 }
