@@ -29,7 +29,8 @@ public class CategoryController {
      * 因为是声明为 @RestController， 所以这个集合，又会被自动转换为 JSON数组抛给浏览器。
      */
     @GetMapping("/categories")
-    public Page4Navigator<Category> list(@RequestParam(value = "start", defaultValue = "0") int start, @RequestParam(value = "size", defaultValue = "5") int size) throws Exception {
+    public Page4Navigator<Category> list(@RequestParam(value = "start", defaultValue = "0") int start,
+                                         @RequestParam(value = "size", defaultValue = "5") int size) throws Exception {
         start = start<0?0:start;
         Page4Navigator<Category> page =categoryService.list(start, size, 5);  //5表示导航分页最多有5个，像 [1,2,3,4,5] 这样
         return page;
