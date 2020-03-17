@@ -12,6 +12,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class ProductService {
 
@@ -20,6 +23,9 @@ public class ProductService {
 
     @Autowired
     CategoryDAO categoryDAO;
+
+    @Autowired
+    ProductImageService productImageService;
 
     public Page4Navigator<Product> list(int cid, int start, int size, int navigatePages){
         Category category = categoryDAO.findById(cid).get();
@@ -43,5 +49,36 @@ public class ProductService {
 
     public void update(Product bean){
         productDAO.save(bean);
+    }
+
+    public void fill(List<Category> categories){
+        for (Category category:categories){
+            fill(category);
+        }
+    }
+
+    public void fill(Category category){
+        List<Product> products = listByCategory(category);
+        productImageService.setFirstProdutImages(products);
+        category.setProducts(products);
+    }
+
+    public void fillByRow(List<Category> categorys) {
+        int productNumberEachRow = 8;
+        for (Category category : categorys) {
+            List<Product> products =  category.getProducts();
+            List<List<Product>> productsByRow =  new ArrayList<>();
+            for (int i = 0; i < products.size(); i+=productNumberEachRow) {
+                int size = i+productNumberEachRow;
+                size= size>products.size()?products.size():size;
+                List<Product> productsOfEachRow =products.subList(i, size);
+                productsByRow.add(productsOfEachRow);
+            }
+            category.setProductsByRow(productsByRow);
+        }
+    }
+
+    public List<Product> listByCategory(Category category){
+        return productDAO.findByCategoryOrderById(category);
     }
 }

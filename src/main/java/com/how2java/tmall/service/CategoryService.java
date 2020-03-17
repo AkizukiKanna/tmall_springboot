@@ -2,6 +2,7 @@ package com.how2java.tmall.service;
 
 import com.how2java.tmall.dao.CategoryDAO;
 import com.how2java.tmall.pojo.Category;
+import com.how2java.tmall.pojo.Product;
 import com.how2java.tmall.util.Page4Navigator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -31,12 +33,12 @@ public class CategoryService {
         return new Page4Navigator<>(pageFromJPA,navigatePages);
     }
 
-//    public List<Category> list(){
-//        //创建一个 Sort 对象，表示通过 id 倒排序。2.0版本需要用Sort.by(),原因是Sort类的构造方法被私有化
-//        Sort sort = Sort.by(Sort.Direction.DESC, "id");
-//        //??只需要列出所有的查询结果，不需要分页，所以使用findAll(Sort)
-//        return categoryDAO.findAll(sort);
-//    }
+    public List<Category> list(){
+        //创建一个 Sort 对象，表示通过 id 倒排序。2.0版本需要用Sort.by(),原因是Sort类的构造方法被私有化
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        //??只需要列出所有的查询结果，不需要分页，所以使用findAll(Sort)
+        return categoryDAO.findAll(sort);
+    }
 
     public void add(Category bean){
         categoryDAO.save(bean);
@@ -54,5 +56,29 @@ public class CategoryService {
 
     public void update(Category bean){
         categoryDAO.save(bean);
+    }
+
+    public void removeCategoryFromProduct(List<Category> cs){
+        for (Category c:cs) {
+            removeCategoryFromProduct(c);
+        }
+    }
+
+    public void removeCategoryFromProduct(Category category){
+        List<Product> products = category.getProducts();
+        if (null!=products){
+            for (Product product:products){
+                product.setCategory(null);
+            }
+        }
+
+        List<List<Product>> productsByRow = category.getProductsByRow();
+        if (null!=productsByRow){
+            for (List<Product> ps : productsByRow) {
+                for (Product p: ps) {
+                    p.setCategory(null);
+                }
+            }
+        }
     }
 }
