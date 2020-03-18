@@ -17,13 +17,14 @@ import java.util.List;
 
 @Service
 public class ProductService {
-
+    @Autowired
+    OrderItemService orderItemService;
+    @Autowired
+    ReviewService reviewService;
     @Autowired
     ProductDAO productDAO;
-
     @Autowired
     CategoryDAO categoryDAO;
-
     @Autowired
     ProductImageService productImageService;
 
@@ -80,5 +81,19 @@ public class ProductService {
 
     public List<Product> listByCategory(Category category){
         return productDAO.findByCategoryOrderById(category);
+    }
+
+    public void setSaleAndReviewNumber(Product product) {
+        int saleCount = orderItemService.getSaleCount(product);
+        product.setSaleCount(saleCount);
+
+        int reviewCount = reviewService.getCount(product);
+        product.setReviewCount(reviewCount);
+
+    }
+
+    public void setSaleAndReviewNumber(List<Product> products) {
+        for (Product product : products)
+            setSaleAndReviewNumber(product);
     }
 }

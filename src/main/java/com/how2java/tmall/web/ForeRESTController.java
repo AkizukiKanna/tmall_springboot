@@ -1,23 +1,25 @@
 package com.how2java.tmall.web;
  
-import com.how2java.tmall.pojo.Category;
-import com.how2java.tmall.pojo.User;
-import com.how2java.tmall.service.CategoryService;
-import com.how2java.tmall.service.ProductService;
-import com.how2java.tmall.service.UserService;
+import com.how2java.tmall.pojo.*;
+import com.how2java.tmall.service.*;
 import com.how2java.tmall.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.HtmlUtils;
 
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ForeRESTController {
+    @Autowired
+    ProductImageService productImageService;
+    @Autowired
+    PropertyValueService propertyValueService;
+    @Autowired
+    ReviewService reviewService;
     @Autowired
     UserService userService;
     @Autowired
@@ -76,5 +78,27 @@ public class ForeRESTController {
         }else {
             return Result.fail("账号密码错误");
         }
+    }
+    @GetMapping("/foreproduct/{pid}")
+    public Object product(@PathVariable("pid") int pid) {
+        Product product = productService.get(pid);
+
+        List<ProductImage> productSingleImages = productImageService.listSingleProductImages(product);
+        List<ProductImage> productDetailImages = productImageService.listDetailProductImages(product);
+        product.setProductSingleImages(productSingleImages);
+        product.setProductDetailImages(productDetailImages);
+
+        List<PropertyValue> pvs = propertyValueService.list(product);
+        List<Review> reviews = reviewService.list(product);
+        productService.setSaleAndReviewNumber(product);
+        productImageService.setFirstProdutImage(product);
+
+        //为什么要用Map呢？ 因为返回出去的数据是多个集合，而非一个集合，所以通过 map返回给浏览器，浏览器更容易识别
+        Map<String,Object> map= new HashMap<>();
+        map.put("product", product);
+        map.put("pvs", pvs);
+        map.put("reviews", reviews);
+
+        return Result.success(map);
     }
 }
