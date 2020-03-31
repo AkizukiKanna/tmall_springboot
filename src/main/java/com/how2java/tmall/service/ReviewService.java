@@ -20,4 +20,8 @@ public class ReviewService {
     public int getCount(Product product){
         return reviewDAO.countByProduct(product);
     }
+
+    public void add(Review review) {
+        reviewDAO.save(review);
+    }
 }

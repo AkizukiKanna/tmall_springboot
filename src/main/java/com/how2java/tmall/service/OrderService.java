@@ -3,6 +3,7 @@ package com.how2java.tmall.service;
 import com.how2java.tmall.dao.OrderDAO;
 import com.how2java.tmall.pojo.Order;
 import com.how2java.tmall.pojo.OrderItem;
+import com.how2java.tmall.pojo.User;
 import com.how2java.tmall.util.Page4Navigator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -44,7 +45,7 @@ public class OrderService {
         }
     }
 
-    private void removeOrderFromOrderItem(Order order){
+    public void removeOrderFromOrderItem(Order order){
         List<OrderItem> orderItems = order.getOrderItems();
         for(OrderItem orderItem: orderItems){
             orderItem.setOrder(null);
@@ -77,4 +78,24 @@ public class OrderService {
     public void add(Order order) {
         orderDAO.save(order);
     }
+
+    public List<Order> listByUserAndNotDeleted(User user) {
+        return orderDAO.findByUserAndStatusNotOrderByIdDesc(user, OrderService.delete);
+    }
+
+    public List<Order> listByUserWithoutDelete(User user) {
+        List<Order> orders = listByUserAndNotDeleted(user);
+        orderItemService.fill(orders);
+        return orders;
+    }
+
+    public void cacl(Order o) {
+        List<OrderItem> orderItems = o.getOrderItems();
+        float total = 0;
+        for (OrderItem orderItem : orderItems) {
+            total+=orderItem.getProduct().getPromotePrice()*orderItem.getNumber();
+        }
+        o.setTotal(total);
+    }
+
 }
