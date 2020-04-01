@@ -5,6 +5,12 @@ import com.how2java.tmall.pojo.*;
 import com.how2java.tmall.service.*;
 import com.how2java.tmall.util.Result;
 import org.apache.commons.lang.math.RandomUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+import org.apache.shiro.crypto.hash.SimpleHash;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.HtmlUtils;
@@ -46,20 +52,53 @@ public class ForeRESTController {
      * 注： 密码为什么没有加密？ User表还有个 salt字段，为什么没有使用。 咳咳。。。 是这样的，目前这里仅仅实现简单的用户注册功能，后续还在这个基础上改造成用 Shiro 来实现用户验证，加密等等。
      * 注： Result 这个类，第一次使用，是在订单管理 发货功能讲解里用到的，当发货成功后，会返回 Result对象。 Result 对象是一种常见的 RESTFUL 风格返回的 json 格式，里面可以有错误代码，错误信息和数据。 这样就比起以前那样，仅仅返回数据附加了更多的信息，方便前端人员识别和显示给用户可识别信息。
      */
+//    @PostMapping("/foreregister")
+//    public Object register(@RequestBody User user) {
+//        String name = user.getName();
+//        String password = user.getPassword();
+//        name = HtmlUtils.htmlEscape(name);
+//        user.setName(name);
+//        boolean exist = userService.isExist(name);
+//
+//        if (exist) {
+//            String message = "用户名已经被使用,不能使用";
+//            return Result.fail(message);
+//        }
+//
+//        user.setPassword(password);
+//
+//        userService.add(user);
+//
+//        return Result.success();
+//    }
+
+    /**
+     * 修改 ForeRESTController 的 register 方法。
+     * 其中注册时候的时候，会通过随机方式创建盐， 并且加密算法采用 "md5", 除此之外还会进行 2次加密。
+     * 这个盐，如果丢失了，就无法验证密码是否正确了，所以会数据库里保存起来。
+     */
     @PostMapping("/foreregister")
     public Object register(@RequestBody User user) {
-        String name = user.getName();
+        String name =  user.getName();
         String password = user.getPassword();
         name = HtmlUtils.htmlEscape(name);
         user.setName(name);
+
         boolean exist = userService.isExist(name);
 
-        if (exist) {
-            String message = "用户名已经被使用,不能使用";
+        if(exist){
+            String message ="用户名已经被使用,不能使用";
             return Result.fail(message);
         }
 
-        user.setPassword(password);
+        String salt = new SecureRandomNumberGenerator().nextBytes().toString();
+        int times = 2;
+        String algorithmName = "md5";
+
+        String encodedPassword = new SimpleHash(algorithmName, password, salt, times).toString();
+
+        user.setSalt(salt);
+        user.setPassword(encodedPassword);
 
         userService.add(user);
 
@@ -71,18 +110,37 @@ public class ForeRESTController {
      * 注 为什么要用 HtmlUtils.htmlEscape？ 因为注册的时候，ForeRESTController.register()，就进行了转义，所以这里也需要转义。
      * 有些同学在恶意注册的时候，会使用诸如 <script>alert('papapa')</script> 这样的名称，会导致网页打开就弹出一个对话框。 那么在转义之后，就没有这个问题了。
      */
+//    @PostMapping("/forelogin")
+//    public Object login(@RequestBody User userParam, HttpSession session) {
+//        String name = userParam.getName();
+//        name = HtmlUtils.htmlEscape(name);
+//
+//        User user = userService.get(name, userParam.getPassword());
+//        if (null != user) {
+//            session.setAttribute("user", user);
+//            return Result.success();
+//        } else {
+//            return Result.fail("账号密码错误");
+//        }
+//    }
     @PostMapping("/forelogin")
     public Object login(@RequestBody User userParam, HttpSession session) {
-        String name = userParam.getName();
+        String name =  userParam.getName();
         name = HtmlUtils.htmlEscape(name);
 
-        User user = userService.get(name, userParam.getPassword());
-        if (null != user) {
+        Subject subject = SecurityUtils.getSubject();
+        UsernamePasswordToken token = new UsernamePasswordToken(name, userParam.getPassword());
+        try {
+            subject.login(token);
+            User user = userService.getByName(name);
+//          subject.getSession().setAttribute("user", user);
             session.setAttribute("user", user);
             return Result.success();
-        } else {
-            return Result.fail("账号密码错误");
+        } catch (AuthenticationException e) {
+            String message ="账号密码错误";
+            return Result.fail(message);
         }
+
     }
 
     @GetMapping("/foreproduct/{pid}")
@@ -109,11 +167,12 @@ public class ForeRESTController {
     }
 
     @GetMapping("forecheckLogin")
-    public Object checkLogin(HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        if (null != user)
+    public Object checkLogin() {
+        Subject subject = SecurityUtils.getSubject();
+        if(subject.isAuthenticated())
             return Result.success();
-        return Result.fail("未登录");
+        else
+            return Result.fail("未登录");
     }
 
     @GetMapping("forecategory/{cid}")
