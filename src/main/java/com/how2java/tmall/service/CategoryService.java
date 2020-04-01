@@ -5,6 +5,9 @@ import com.how2java.tmall.pojo.Category;
 import com.how2java.tmall.pojo.Product;
 import com.how2java.tmall.util.Page4Navigator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,12 +19,14 @@ import java.util.Optional;
 
 
 @Service
+@CacheConfig(cacheNames="categories")
 public class CategoryService {
 
     @Autowired
     CategoryDAO categoryDAO;
 
     //navigatePages分页导航栏要显示出的页的数量
+    @Cacheable(key="'categories-page-'+#p0+ '-' + #p1")
     public Page4Navigator<Category> list(int start, int size, int navigatePages){
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         //Pageable pageable = new PageRequest(start, size,sort);过时。
@@ -33,6 +38,7 @@ public class CategoryService {
         return new Page4Navigator<>(pageFromJPA,navigatePages);
     }
 
+    @Cacheable(key="'categories-all'")
     public List<Category> list(){
         //创建一个 Sort 对象，表示通过 id 倒排序。2.0版本需要用Sort.by(),原因是Sort类的构造方法被私有化
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
@@ -40,20 +46,27 @@ public class CategoryService {
         return categoryDAO.findAll(sort);
     }
 
+    @CacheEvict(allEntries=true)
+//  @CachePut(key="'category-one-'+ #p0")
     public void add(Category bean){
         categoryDAO.save(bean);
     }
 
+    @CacheEvict(allEntries=true)
+//  @CacheEvict(key="'category-one-'+ #p0")
     public void delete(int id){
         categoryDAO.deleteById(id);
     }
 
+    @Cacheable(key="'categories-one-'+ #p0")
     public Category get(int id){
         Optional<Category> byId = categoryDAO.findById(id);
         Category bean = byId.get();
         return bean;
     }
 
+    @CacheEvict(allEntries=true)
+//  @CachePut(key="'category-one-'+ #p0")
     public void update(Category bean){
         categoryDAO.save(bean);
     }
