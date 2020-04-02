@@ -1,6 +1,7 @@
 package com.how2java.tmall.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.data.elasticsearch.annotations.Document;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -9,6 +10,8 @@ import java.util.List;
 @Entity
 @Table(name = "product")
 @JsonIgnoreProperties({ "handler","hibernateLazyInitializer"})
+//这个index就好比是数据库，type相当于数据表，相当于建立了数据库和表，将数据库中的数据保存在里面
+@Document(indexName = "tmall_springboot",type = "product")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
