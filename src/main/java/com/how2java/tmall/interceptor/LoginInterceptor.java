@@ -54,6 +54,28 @@ public class LoginInterceptor implements HandlerInterceptor {
                 return false;
             }
         }
+
+        //后台验证
+        if (begingWith(page,new String[]{"admin"})){
+            Subject subject = SecurityUtils.getSubject();
+            if(!subject.isAuthenticated()) {
+                httpServletResponse.sendRedirect("login");
+                return false;
+            }
+
+            if (subject.isPermitted(page)){
+                System.out.println("后台验证成功了");
+                return true;
+            }
+            else{
+                System.out.println("执行后台验证，验证失败了");
+                httpServletResponse.sendRedirect("home");
+            }
+        }
+
+
+
+
         return true;
     }
 

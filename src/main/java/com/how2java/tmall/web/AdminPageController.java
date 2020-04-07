@@ -75,5 +75,9 @@ public class AdminPageController {
         return "admin/listUser";
 
     }
+    @GetMapping("/admin_testfooter")
+    public String testfooter(){
+        return "admin/testfooter";
+    }
 
 }
